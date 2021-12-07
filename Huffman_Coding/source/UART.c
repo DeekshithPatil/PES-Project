@@ -14,7 +14,7 @@
 #define UART_OVERSAMPLE_RATE 	(16)
 
 #define SYS_CLOCK				(24e6)
-#define	BAUD_RATE				38400
+#define	BAUD_RATE				115200
 #define STOP_BITS_NO			2
 #define	NO_PARITY				0
 

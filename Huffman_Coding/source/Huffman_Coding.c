@@ -7,14 +7,13 @@
 #include "UART.h"
 #include "cbfifo.h"
 #include "syscalls.h"
-#include "FSM.h"
 #include "test_cbfifo.h"
+#include "huffman.h"
+
 
 
 int main(void)
 {
-
-  	char str[CAPACITY + 1] = "";
 
 #ifdef DEBUG
   	test_cbfifo();
@@ -24,15 +23,10 @@ int main(void)
 
 	Init_UART0();
 
-	printf("\r\nWelcome to BreakfastSerial!\r\n");
+	printf("\r\nWelcome to Huffman Encoding!\r\n");
 
 	while (1)
 	{
-		printf("\r\n? ");
-
-		accumulate_line(str);
-
-		process_command(str);
 
 	}
 
