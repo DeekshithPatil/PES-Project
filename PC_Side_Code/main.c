@@ -3,20 +3,21 @@
 #include <fcntl.h>
 #include <assert.h>
 
+#define ERROR_CODE_UNABLE_TO_OPEN_SECIFIED_PORT         -1
+
 int main(int argc, char * argv[])
 {
     char byte;
-    ssize_t size;
 
     printf("COM PORT = %s\n", argv[1]);
     int port = open(argv[1], O_RDWR);
 
-    assert(port != -1);
-    printf("port = %d\n", port);
+    assert(port != ERROR_CODE_UNABLE_TO_OPEN_SECIFIED_PORT);
+    printf("port= %d\n", port);
 
     while(1)
     {
-      size = read(port, &byte, 1);
+      read(port, &byte, 1);
       printf("%c", byte);
     }
 
