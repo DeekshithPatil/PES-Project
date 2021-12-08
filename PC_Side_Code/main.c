@@ -1,35 +1,25 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <fcntl.h>    
+#include <fcntl.h>
+#include <assert.h>
 
-int main() {
+int main(int argc, char * argv[])
+{
     char byte;
-    int fd = open("/dev/ttyACM0", O_RDWR);
-    ssize_t size = 0;
-    
-    char str[100] = "";
-    int i = 0;
+    ssize_t size;
+
+    printf("COM PORT = %s\n", argv[1]);
+    int port = open(argv[1], O_RDWR);
+
+    assert(port != -1);
+    printf("port = %d\n", port);
+
     while(1)
     {
-
-	do
-	{
-		size = read(fd, &byte, 1);
-	}while(size == 0);
-	
-	if(byte == '\0')
-	{
-		str[i] = '\0';
-		printf("%s\n",str);
-		i = 0;
-	}
-	
-	else
-	{
-		str[i] = byte;
-		i = (i + 1)%100;
-	}
+      size = read(port, &byte, 1);
+      printf("%c", byte);
     }
+
 
     return 0;
 }
