@@ -8,9 +8,6 @@
 #include "cbfifo.h"
 #include "syscalls.h"
 #include "test_cbfifo.h"
-#include "huffman.h"
-
-
 
 int main(void)
 {
@@ -23,7 +20,7 @@ int main(void)
 
 	Init_UART0();
 
-	printf("\r\nWelcome to Huffman Encoding!\r\n");
+	printf("Hello\n");
 
 	while (1)
 	{

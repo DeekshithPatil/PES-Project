@@ -8,7 +8,7 @@
 int main(int argc, char * argv[])
 {
     char byte;
-
+    size_t len;
     printf("COM PORT = %s\n", argv[1]);
     int port = open(argv[1], O_RDWR);
 
@@ -17,7 +17,10 @@ int main(int argc, char * argv[])
 
     while(1)
     {
-      read(port, &byte, 1);
+      do {
+        len = read(port, &byte, 1);
+      } while(len == 0);
+
       printf("%c", byte);
     }
 

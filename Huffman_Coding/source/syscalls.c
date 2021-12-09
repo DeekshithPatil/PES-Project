@@ -7,6 +7,12 @@
 
 
 #include "syscalls.h"
+#include <stdint.h>
+
+extern int huffman_encode(char *message, uint8_t *buffer, size_t nbytes);
+
+#define ENCODE_BUFFER_SIZE					1024
+uint8_t encode_buffer[ENCODE_BUFFER_SIZE] = {0};
 
 int __sys_readc(void)
 {
@@ -28,13 +34,16 @@ int __sys_write(int handle, char *buf, int size)
 {
 	size_t temp;
 
+	int len = huffman_encode(buf, encode_buffer, ENCODE_BUFFER_SIZE);
+
 	//Blocking call. Wait as long as Tx_buffer is not empty
 	while(cbfifo_length(Tx_Buffer) != 0){}
 
 	//If TxQueue is not full, enqueue the bytes
 	if(cbfifo_length(Tx_Buffer) != cbfifo_capacity(Tx_Buffer))
 	{
-		temp = cbfifo_enqueue(Tx_Buffer,buf,size);
+//		temp = cbfifo_enqueue(Tx_Buffer,buf,size);
+		temp = cbfifo_enqueue(Tx_Buffer,encode_buffer,len);
 
 		// start transmitter if it isn't already running
 		if (!(UART0->C2 & UART0_C2_TIE_MASK)) {
