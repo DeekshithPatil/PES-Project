@@ -1,2 +1,3 @@
-all:
-	gcc -Wall -Werror main.c -o main
+all:	main.c	serial.c
+	gcc main.c serial.c -o main
+
