@@ -20,7 +20,7 @@ int main(void)
 
 	Init_UART0();
 
-	printf("A");
+	printf("a");
 
 	while (1)
 	{
