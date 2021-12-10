@@ -1,0 +1,6 @@
+
+Huffman_Coding.axf: huffman.h
+
+huffman.h:	huffman.py
+	python3	huffman.py > ../source/huffman.h
+	
