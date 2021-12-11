@@ -14,6 +14,8 @@
 #include <assert.h>
 #include <stdint.h>
 
+#define MASK(x)					((1U << x) - 1)
+
 static int min(int a , int b);
 
 //Refer huffman.h for funciton description
@@ -42,7 +44,7 @@ int huffman_encode(char *message, uint8_t *buffer, size_t nbytes)
 			//read_shift: position within code to get the bits from
 			//tmp: bits to write, shifted down to lsb
 			int read_shift = code_bits - this_write;
-			uint32_t tmp = (code >> read_shift);
+			uint32_t tmp = (code >> read_shift) & MASK(this_write);
 
 			//buff[buf_idx]: buffer we're writing into
 			//write_shift: shift to fit into this byte of the buffer
