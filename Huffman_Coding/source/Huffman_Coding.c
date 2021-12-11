@@ -11,7 +11,7 @@
 
 int main(void)
 {
-
+	int x = 0;
 #ifdef DEBUG
   	test_cbfifo();
 #endif
@@ -20,7 +20,9 @@ int main(void)
 
 	Init_UART0();
 
-	printf("{");
+//	printf("Hey! How's it going\n This is a huge string test. Let's see if it works!!!. I'm so excited!!\n");
+
+	printf("This is a dynamic string test = %d",x);
 
 	while (1)
 	{

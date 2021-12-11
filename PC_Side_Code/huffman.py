@@ -86,7 +86,7 @@ for (char, frequency) in freq:
     length = len(huffmanCode[char])
     if(length > maximum):
         maximum = length
-    elif(length < minimum):
+    if(length < minimum):
         minimum = length
 
 print(f'#define HUFF_CODE_MIN_LENGTH ({minimum})')
@@ -114,6 +114,26 @@ for (char, frequency) in freq:
     count = count + 1
 
 print("{HUFF_CODE_END_SYMBOL,0,0}};")
+
+print("")
+
+
+c_func_desc = """
+/*
+* @brief - Encodes a message using the defined Huffman code.
+*
+* Parameters:
+* message   - Null terminated mesage to be encoded
+* buffer    - Resulting encoded bytes will be encoded huffman_code_tree
+* nbytes    - Size of buffer, in nbytes
+*
+* Returns:
+*   Number of bytes encoded
+*/
+int huffman_encode(char *message, uint8_t *buffer, size_t nbytes);
+"""
+
+print(c_func_desc)
 
 print("")
 

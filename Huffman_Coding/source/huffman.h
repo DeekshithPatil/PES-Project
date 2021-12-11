@@ -16,7 +16,7 @@ typedef struct
 }huffman_code_t;
 
 #define HUFF_CODE_END_SYMBOL  '\0'
-#define HUFF_CODE_MIN_LENGTH (4)
+#define HUFF_CODE_MIN_LENGTH (3)
 #define HUFF_CODE_MAX_LENGTH (19)
 
 huffman_code_t huffman_code[] = {

@@ -16,7 +16,7 @@ typedef struct
 }huffman_code_t;
 
 #define HUFF_CODE_END_SYMBOL  '\0'
-#define HUFF_CODE_MIN_LENGTH (4)
+#define HUFF_CODE_MIN_LENGTH (3)
 #define HUFF_CODE_MAX_LENGTH (19)
 
 huffman_code_t huffman_code[] = {
@@ -118,5 +118,20 @@ huffman_code_t huffman_code[] = {
 {'{',0x669ad,19},
 {'$',0x669ac,19},
 {HUFF_CODE_END_SYMBOL,0,0}};
+
+
+/*
+* @brief - Encodes a message using the defined Huffman code.
+*
+* Parameters:
+* message   - Null terminated mesage to be encoded
+* buffer    - Resulting encoded bytes will be encoded huffman_code_tree
+* nbytes    - Size of buffer, in nbytes
+*
+* Returns:
+*   Number of bytes encoded
+*/
+int huffman_encode(char *message, uint8_t *buffer, size_t nbytes);
+
 
 #endif /*HUFFMAN_H_*/
