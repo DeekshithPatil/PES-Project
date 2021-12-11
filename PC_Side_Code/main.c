@@ -29,18 +29,20 @@ void start_serial_read()
     unsigned char decoded_data = 0; //holds the decoded data, after going through the huffman table and decoding the received bit stream
     uint32_t temp_data = 0;
     int read_len=0;
+    printf("****************************************\n");
     printf("Starting serial read!\nWaiting for data..\n");
 
     while(1)
     {
       //Reset temp_data and read_len
-      temp_data = 0;
-      read_len = 0;
+      // temp_data = 0;
+      // read_len = 0;
       //Read 1 byte of data from serial port
       do
       {
         len = file_read_data(g_fd,&read_data,1);
-      } while(len == NO_BYTE_AVAILABLE); //Wait as long as a byte is availabe
+      } while(len == NO_BYTE_AVAILABLE); //Wait as long as a byte is not availabe
+
 
       //Loop 8 times, before reading the next byte of data.
       for(int iteration = 0; iteration < 8; iteration++)
@@ -69,19 +71,25 @@ void start_serial_read()
         {
           decoded_data = HUFF_CODE_END_SYMBOL;
           // printf("Code = %x, Code_bits = %d\n",temp_data,read_len);
-          for(int i=0; huffman_code[i].code!=HUFF_CODE_END_SYMBOL;i++) //Iterate throughout the table
+          // for(int i=0; huffman_code[i].code!=HUFF_CODE_END_SYMBOL;i++) //Iterate throughout the table
+          for(int i=0; (huffman_code[i].code!=HUFF_CODE_END_SYMBOL) || (huffman_code[i].code_bits > 0);i++) //Iterate throughout the table
           {
             if((temp_data == huffman_code[i].code) && (read_len == huffman_code[i].code_bits)) //Check if current len and code matches with any in lookup table
             {
               decoded_data = huffman_code[i].symbol;
               break;
             }
+            // if(read_len == 12)
+            // {
+            //   printf("i = %d, symbol = %x, code_bits = %d\n", i,huffman_code[i].code,huffman_code[i].code_bits);
+            // }
           }
           //If the decoding was Successful
           if(decoded_data != HUFF_CODE_END_SYMBOL)
           {
-            // setvbuf (stdout, NULL, _IONBF, 0);
-            printf("%c\n", decoded_data);
+            setvbuf (stdout, NULL, _IONBF, 0);
+            // printf("\nTemp data = %x, read_len = %u\n",temp_data,read_data);
+            printf("%c", decoded_data);
             temp_data = 0;
             read_len = 0;
           }
