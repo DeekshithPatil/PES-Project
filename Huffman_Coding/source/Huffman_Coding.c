@@ -20,9 +20,9 @@ int main(void)
 
 	Init_UART0();
 
-//	printf("Hey! How's it going\n This is a huge string test. Let's see if it works!!!. I'm so excited!!\n");
+	printf("Hey! How's it going\n This is a huge string test. Let's see if it works!!!. I'm so excited!!\n");
 
-	printf("This is a dynamic string test = %d",x);
+//	printf("$");
 
 	while (1)
 	{

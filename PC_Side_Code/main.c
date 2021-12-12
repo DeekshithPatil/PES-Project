@@ -19,6 +19,8 @@
 #define NO_BYTE_AVAILABLE                 -1
 #define MSB_BIT_MASK                      0x80
 
+unsigned int file_read_count = 0;
+
 /*
 * Brief - Used to start reading data from the serial port
 */
@@ -34,16 +36,21 @@ void start_serial_read()
 
     while(1)
     {
-      //Reset temp_data and read_len
-      // temp_data = 0;
-      // read_len = 0;
       //Read 1 byte of data from serial port
+      printf("read_len=%d\n", read_len);
       do
       {
+        file_read_count++;
         len = file_read_data(g_fd,&read_data,1);
+        if(file_read_count == 500)
+        {
+          temp_data = 0;
+          read_len = 0;
+          file_read_count = 0;
+        }
       } while(len == NO_BYTE_AVAILABLE); //Wait as long as a byte is not availabe
 
-
+      file_read_count = 0;
       //Loop 8 times, before reading the next byte of data.
       for(int iteration = 0; iteration < 8; iteration++)
       {
@@ -70,8 +77,6 @@ void start_serial_read()
         else if(read_len >= HUFF_CODE_MIN_LENGTH && read_len <= HUFF_CODE_MAX_LENGTH)
         {
           decoded_data = HUFF_CODE_END_SYMBOL;
-          // printf("Code = %x, Code_bits = %d\n",temp_data,read_len);
-          // for(int i=0; huffman_code[i].code!=HUFF_CODE_END_SYMBOL;i++) //Iterate throughout the table
           for(int i=0; (huffman_code[i].code!=HUFF_CODE_END_SYMBOL) || (huffman_code[i].code_bits > 0);i++) //Iterate throughout the table
           {
             if((temp_data == huffman_code[i].code) && (read_len == huffman_code[i].code_bits)) //Check if current len and code matches with any in lookup table
@@ -79,10 +84,6 @@ void start_serial_read()
               decoded_data = huffman_code[i].symbol;
               break;
             }
-            // if(read_len == 12)
-            // {
-            //   printf("i = %d, symbol = %x, code_bits = %d\n", i,huffman_code[i].code,huffman_code[i].code_bits);
-            // }
           }
           //If the decoding was Successful
           if(decoded_data != HUFF_CODE_END_SYMBOL)
