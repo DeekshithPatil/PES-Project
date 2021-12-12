@@ -14,6 +14,8 @@ extern int huffman_encode(char *message, uint8_t *buffer, size_t nbytes);
 #define ENCODE_BUFFER_SIZE					1024
 uint8_t encode_buffer[ENCODE_BUFFER_SIZE] = {0};
 
+void delay();
+
 int __sys_readc(void)
 {
 	int c;
@@ -33,6 +35,8 @@ int __sys_readc(void)
 int __sys_write(int handle, char *buf, int size)
 {
 	size_t temp;
+
+	delay();
 
 	int len = huffman_encode(buf, encode_buffer, ENCODE_BUFFER_SIZE);
 
@@ -56,4 +60,15 @@ int __sys_write(int handle, char *buf, int size)
 
 
 	return -1;
+}
+
+void delay()
+{
+	for(int i=0; i< 100; i++)
+	{
+		for(int j = 0; j<1000; j++)
+		{
+
+		}
+	}
 }

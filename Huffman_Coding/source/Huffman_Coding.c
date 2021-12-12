@@ -11,7 +11,7 @@
 
 int main(void)
 {
-	int x = 0;
+//	int x = 0;
 #ifdef DEBUG
   	test_cbfifo();
 #endif
@@ -22,7 +22,7 @@ int main(void)
 
 	printf("Hey! How's it going\n This is a huge string test. Let's see if it works!!!. I'm so excited!!\n");
 
-//	printf("$");
+	printf("The second string is long as well! This is decoded perfectly as well!!\n");
 
 	while (1)
 	{

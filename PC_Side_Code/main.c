@@ -21,6 +21,10 @@
 
 unsigned int file_read_count = 0;
 
+#define G_ARRAY_SIZE                       256
+uint8_t g_array[G_ARRAY_SIZE] = {0};
+int g_index = 0;
+
 /*
 * Brief - Used to start reading data from the serial port
 */
@@ -36,21 +40,31 @@ void start_serial_read()
 
     while(1)
     {
-      //Read 1 byte of data from serial port
-      printf("read_len=%d\n", read_len);
+      g_index = 0;
+      file_read_count = 0;
+     //Read 1 byte of data from serial port and add to g_array
       do
       {
         file_read_count++;
-        len = file_read_data(g_fd,&read_data,1);
-        if(file_read_count == 500)
+        len = file_read_data(g_fd,&g_array[g_index],1);
+
+        if(len!= NO_BYTE_AVAILABLE)
         {
-          temp_data = 0;
-          read_len = 0;
+          g_index++;
           file_read_count = 0;
         }
-      } while(len == NO_BYTE_AVAILABLE); //Wait as long as a byte is not availabe
 
+      }while((g_index < G_ARRAY_SIZE) && (file_read_count < 50000));
+
+      temp_data = 0;
+      read_len = 0;
       file_read_count = 0;
+
+      for(int front_index = 0; front_index <= g_index; front_index++)
+      {
+
+        read_data = g_array[front_index];
+
       //Loop 8 times, before reading the next byte of data.
       for(int iteration = 0; iteration < 8; iteration++)
       {
@@ -90,13 +104,16 @@ void start_serial_read()
           {
             setvbuf (stdout, NULL, _IONBF, 0);
             // printf("\nTemp data = %x, read_len = %u\n",temp_data,read_data);
-            printf("%c", decoded_data);
+            // printf("%c", decoded_data);
+            if((decoded_data != '-') && (front_index != g_index))
+              printf("%c", decoded_data);
             temp_data = 0;
             read_len = 0;
           }
         }
 
       }
+    }
     }
 }
 
