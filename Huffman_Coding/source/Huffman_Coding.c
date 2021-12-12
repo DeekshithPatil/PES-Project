@@ -20,9 +20,14 @@ int main(void)
 
 	Init_UART0();
 
-	printf("Hey! How's it going\n This is a huge string test. Let's see if it works!!!. I'm so excited!!\n");
+	printf("\nHey! How's it going\n This is a huge string test. Let's see if it works!!!. I'm so excited!!\n");
 
 	printf("The second string is long as well! This is decoded perfectly as well!!\n");
+
+	for(int i= 0; i< 10; i++)
+	{
+		printf("\nDynamic string No. = %d",i+1);
+	}
 
 	while (1)
 	{

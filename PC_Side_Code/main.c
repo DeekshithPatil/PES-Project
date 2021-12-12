@@ -54,7 +54,7 @@ void start_serial_read()
           file_read_count = 0;
         }
 
-      }while((g_index < G_ARRAY_SIZE) && (file_read_count < 50000));
+      }while((g_index < G_ARRAY_SIZE) && (file_read_count < 500));
 
       temp_data = 0;
       read_len = 0;

@@ -7,6 +7,7 @@
 
 
 #include "syscalls.h"
+#include "Delay.h"
 #include <stdint.h>
 
 extern int huffman_encode(char *message, uint8_t *buffer, size_t nbytes);
@@ -14,7 +15,6 @@ extern int huffman_encode(char *message, uint8_t *buffer, size_t nbytes);
 #define ENCODE_BUFFER_SIZE					1024
 uint8_t encode_buffer[ENCODE_BUFFER_SIZE] = {0};
 
-void delay();
 
 int __sys_readc(void)
 {
@@ -36,12 +36,11 @@ int __sys_write(int handle, char *buf, int size)
 {
 	size_t temp;
 
-	delay();
 
 	int len = huffman_encode(buf, encode_buffer, ENCODE_BUFFER_SIZE);
 
 	//Blocking call. Wait as long as Tx_buffer is not empty
-	while(cbfifo_length(Tx_Buffer) != 0){}
+	while(cbfifo_length(Tx_Buffer) != 0){delay(2);}
 
 	//If TxQueue is not full, enqueue the bytes
 	if(cbfifo_length(Tx_Buffer) != cbfifo_capacity(Tx_Buffer))
@@ -60,15 +59,4 @@ int __sys_write(int handle, char *buf, int size)
 
 
 	return -1;
-}
-
-void delay()
-{
-	for(int i=0; i< 100; i++)
-	{
-		for(int j = 0; j<1000; j++)
-		{
-
-		}
-	}
 }
