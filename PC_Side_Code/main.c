@@ -74,6 +74,10 @@ int get_buffer(uint8_t *buff)
    return buff_index;
 }
 
+/*
+* Brief - Used to find a huffman code fromt the table, given the "code" and "code_bits" of the find_huffman_symbol
+*       - Returns the decoded character (or symbol) if match was found, else 'HUFF_CODE_END_SYMBOL' is returned
+*/
 unsigned char find_huffman_symbol(uint32_t code, int code_bits)
 {
   //Iterate throughout the table
@@ -90,6 +94,10 @@ unsigned char find_huffman_symbol(uint32_t code, int code_bits)
   return HUFF_CODE_END_SYMBOL;
 }
 
+/*
+* Brief - This functon performs huffman decoding on a buffer ('buff') of length 'buf_index'
+*       - The decoded bytes are printed to 'stdout'
+*/
 void huffman_decode(uint8_t *buff, int buff_index)
 {
   uint8_t read_data = 0;
@@ -163,9 +171,6 @@ void start_serial_read()
 
     while(1)
     {
-
-      buff_index = 0;
-
       //get a buffer of data and then start decoding on it
       buff_index = get_buffer(buff);
 
