@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "serial.h"
 #include "huffman.h"
@@ -23,6 +24,22 @@
 #define SET_LAST_BIT_MASK                 0x01
 
 #define BUFF_SIZE                         256
+
+int g_bits_received = 0;
+int g_bits_decoded = 0;
+
+void int_handler(int sug)
+{
+  printf("\b\b");
+  printf("\n\n********** Compression Statistics ****************\n");
+  printf("\b\b\nTotal bits received = %d\nTotal bits decoded = %d\n",g_bits_received,g_bits_decoded);
+
+  double compression_ratio = ((double)(g_bits_decoded - g_bits_received) * 100) / g_bits_decoded;
+
+  printf("Achieved compression ratio: %f%% \n",  compression_ratio);
+  printf("\n****************************************************\n");
+  exit(0);
+}
 
 int get_buffer(uint8_t *buff);
 unsigned char find_huffman_symbol(uint32_t code, int code_bits);
@@ -56,6 +73,8 @@ int get_buffer(uint8_t *buff)
   int len = 0;
   unsigned int file_read_count = 0;
 
+  signal(SIGINT,int_handler);
+
   //Read 1 byte of data from serial port and add to buff
    do
    {
@@ -71,7 +90,7 @@ int get_buffer(uint8_t *buff)
    }while((buff_index < BUFF_SIZE) && (file_read_count < FILE_READ_COUNT_ERROR_THRESHOLD));
    //Loop as long as the number of bytes read is less thant max_size and number of unsuccessful reads is less than count
 
-   return buff_index;
+   return buff_index-1;
 }
 
 /*
@@ -147,7 +166,14 @@ void huffman_decode(uint8_t *buff, int buff_index)
           setvbuf (stdout, NULL, _IONBF, 0);
           //Do not print decoded data if decoded is '-' and it's the last byte in buffer
           if((decoded_data != '-') && (front_index != buff_index))
+          {
             printf("%c", decoded_data);
+            //Increment the total number of bits recieved by the code_bits of the decoded symbol
+            g_bits_received += read_len;
+            //Increment the total number of bits decoded by 8 (because each ascii character is 1 byte long)
+            g_bits_decoded +=8;
+          }
+
           temp_data = 0;
           read_len = 0;
         }
