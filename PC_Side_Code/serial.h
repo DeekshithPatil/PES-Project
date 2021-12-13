@@ -1,6 +1,7 @@
 /*
 * Brief - Consists of necessary funcitons to open, read and write to a serial port
 * Author - Deekshith Reddy Patil, patil.deekshithreddy@colorado.edu
+* Implementation credits: https://www.youtube.com/watch?v=tUJ-wTafQLA, https://github.com/sckulkarni246/ke-rpi-samples/blob/main/uart-c-termios/uart_loopback.c
 */
 
 #ifndef __SERIAL_H__
