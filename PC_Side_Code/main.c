@@ -24,15 +24,17 @@
 #define SET_LAST_BIT_MASK                 0x01
 
 #define BUFF_SIZE                         256
+#define DECODE_BUFF_SIZE                  512
 
 int g_bits_received = 0;
 int g_bits_decoded = 0;
 
 void int_handler(int sug)
 {
-  printf("\b\b");
+  // printf("\b\b");
+  // fflush(stdout);
   printf("\n\n********** Compression Statistics ****************\n");
-  printf("\b\b\nTotal bits received = %d\nTotal bits decoded = %d\n",g_bits_received,g_bits_decoded);
+  printf("\nTotal bits received = %d\nTotal bits decoded = %d\n",g_bits_received,g_bits_decoded);
 
   double compression_ratio = ((double)(g_bits_decoded - g_bits_received) * 100) / g_bits_decoded;
 
@@ -43,7 +45,7 @@ void int_handler(int sug)
 
 int get_buffer(uint8_t *buff);
 unsigned char find_huffman_symbol(uint32_t code, int code_bits);
-void huffman_decode(uint8_t *buff, int buff_index);
+int huffman_decode(uint8_t *buff, int buff_index, unsigned char * decode_buffer);
 void start_serial_read();
 
 int main(int argc, char *argv[])
@@ -90,7 +92,7 @@ int get_buffer(uint8_t *buff)
    }while((buff_index < BUFF_SIZE) && (file_read_count < FILE_READ_COUNT_ERROR_THRESHOLD));
    //Loop as long as the number of bytes read is less thant max_size and number of unsuccessful reads is less than count
 
-   return buff_index-1;
+   return buff_index;
 }
 
 /*
@@ -115,21 +117,23 @@ unsigned char find_huffman_symbol(uint32_t code, int code_bits)
 
 /*
 * Brief - This functon performs huffman decoding on a buffer ('buff') of length 'buf_index'
-*       - The decoded bytes are printed to 'stdout'
+*       - The decoded bytes are printed stored in decode_buff
+*       - Returns the length of decode_buff
 */
-void huffman_decode(uint8_t *buff, int buff_index)
+int huffman_decode(uint8_t *buff, int buff_index, unsigned char * decode_buff)
 {
   uint8_t read_data = 0;
   uint32_t temp_data = 0;
   int read_len = 0; //Holds the number of bits currently read.
                     //Used to compare with code_bits in huff_table
 
+  int decode_index = 0;
+
   unsigned char decoded_data = 0; //holds the decoded data, after going through the huffman table and decoding the received bit stream
 
   //Loop Through the buffered array, byte-by-byte
   for(int front_index = 0; front_index <= buff_index; front_index++)
   {
-
     read_data = buff[front_index];
 
     //Loop 8 times (all the bits in the byte), before reading the next byte of data.
@@ -167,7 +171,8 @@ void huffman_decode(uint8_t *buff, int buff_index)
           //Do not print decoded data if decoded is '-' and it's the last byte in buffer
           if((decoded_data != '-') && (front_index != buff_index))
           {
-            printf("%c", decoded_data);
+            // printf("%c", decoded_data);
+            decode_buff[decode_index++] = decoded_data;
             //Increment the total number of bits recieved by the code_bits of the decoded symbol
             g_bits_received += read_len;
             //Increment the total number of bits decoded by 8 (because each ascii character is 1 byte long)
@@ -181,6 +186,9 @@ void huffman_decode(uint8_t *buff, int buff_index)
 
     }
   }
+
+  decode_buff[decode_index] = '\0';
+  return decode_index;
 }
 
 /*
@@ -188,19 +196,26 @@ void huffman_decode(uint8_t *buff, int buff_index)
 */
 void start_serial_read()
 {
+  unsigned char decode_buff[DECODE_BUFF_SIZE];
+  uint8_t buff[BUFF_SIZE];
+  int buff_index = 0;
+  int decode_len = 0;
 
-    uint8_t buff[BUFF_SIZE];
-    int buff_index = 0;
+  printf("****************************************\n");
+  printf("Starting serial read!\nWaiting for data..\n");
 
-    printf("****************************************\n");
-    printf("Starting serial read!\nWaiting for data..\n");
-
-    while(1)
+  while(1)
+  {
+    //get a buffer of data and then start decoding on it
+    do
     {
-      //get a buffer of data and then start decoding on it
       buff_index = get_buffer(buff);
+    } while(buff_index < 1);
 
-      //decode
-      huffman_decode(buff,buff_index);
-    }
+    //decode
+    decode_len = huffman_decode(buff,buff_index,decode_buff);
+
+    printf("%s", decode_buff);
+    
+  }
 }
