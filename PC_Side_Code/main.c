@@ -24,6 +24,27 @@
 
 #define BUFF_SIZE                         256
 
+int get_buffer(uint8_t *buff);
+unsigned char find_huffman_symbol(uint32_t code, int code_bits);
+void huffman_decode(uint8_t *buff, int buff_index);
+void start_serial_read();
+
+int main(int argc, char *argv[])
+{
+    printf("Opening port: %s\n",argv[1]);
+
+    assert(argc == TOTAL_ACCEPTABLE_TERMINAL_COMMANDS);
+
+    open_serial_port(argv[1]);
+
+    printf("Successful\n");
+
+    configure_serial_port();
+
+    start_serial_read();
+
+    return 0;
+}
 
 /*
 * Brief - This function is used to get the a buffer of bytes from the serial port
@@ -53,16 +74,86 @@ int get_buffer(uint8_t *buff)
    return buff_index;
 }
 
+unsigned char find_huffman_symbol(uint32_t code, int code_bits)
+{
+  //Iterate throughout the table
+  for(int i=0; (huffman_code[i].code!=HUFF_CODE_END_SYMBOL) || (huffman_code[i].code_bits > 0);i++)
+  {
+    //Check if current len and code matches with any in lookup table
+    if((code == huffman_code[i].code) && (code_bits == huffman_code[i].code_bits))
+    {
+      //found!!
+      return(huffman_code[i].symbol);
+    }
+  }
+
+  return HUFF_CODE_END_SYMBOL;
+}
+
+void huffman_decode(uint8_t *buff, int buff_index)
+{
+  uint8_t read_data = 0;
+  uint32_t temp_data = 0;
+  int read_len = 0; //Holds the number of bits currently read.
+                    //Used to compare with code_bits in huff_table
+
+  unsigned char decoded_data = 0; //holds the decoded data, after going through the huffman table and decoding the received bit stream
+
+  //Loop Through the buffered array, byte-by-byte
+  for(int front_index = 0; front_index <= buff_index; front_index++)
+  {
+
+    read_data = buff[front_index];
+
+    //Loop 8 times (all the bits in the byte), before reading the next byte of data.
+    for(int iteration = 0; iteration < 8; iteration++)
+    {
+
+      temp_data = temp_data << 1;
+      //Check if the Most significant bit is a one
+      if(read_data & MSB_BIT_MASK)
+      {
+        temp_data |= (SET_LAST_BIT_MASK); //append 1 into last bit
+      }
+
+      read_len++;
+      read_data = read_data << 1;
+
+      //Check if read_len is greater than HUFF_CODE_MAX_LENGTH
+      if(read_len > HUFF_CODE_MAX_LENGTH)
+      {
+        //Reset temp_data and read_len
+        temp_data = 0;
+        read_len = 0;
+      }
+
+      //If read_len lies in the range of min and max length of huff codes
+      else if(read_len >= HUFF_CODE_MIN_LENGTH && read_len <= HUFF_CODE_MAX_LENGTH)
+      {
+        decoded_data = find_huffman_symbol(temp_data,read_len);
+
+        //If the decoding was Successful
+        if(decoded_data != HUFF_CODE_END_SYMBOL)
+        {
+          //Print decoded data and reset temp_data and read_len
+          setvbuf (stdout, NULL, _IONBF, 0);
+          //Do not print decoded data if decoded is '-' and it's the last byte in buffer
+          if((decoded_data != '-') && (front_index != buff_index))
+            printf("%c", decoded_data);
+          temp_data = 0;
+          read_len = 0;
+        }
+      }
+
+    }
+  }
+}
+
 /*
 * Brief - Used to start reading data from the serial port
 */
 void start_serial_read()
 {
-    uint8_t read_data = 0;
-    unsigned char decoded_data = 0; //holds the decoded data, after going through the huffman table and decoding the received bit stream
-    uint32_t temp_data = 0;
-    int read_len = 0; //Holds the number of bits currently read.
-                      //Used to compare with code_bits in huff_table
 
     uint8_t buff[BUFF_SIZE];
     int buff_index = 0;
@@ -74,86 +165,11 @@ void start_serial_read()
     {
 
       buff_index = 0;
-      temp_data = 0;
-      read_len = 0;
 
       //get a buffer of data and then start decoding on it
       buff_index = get_buffer(buff);
 
-      //Loop Through the buffered array, byte-by-byte
-      for(int front_index = 0; front_index <= buff_index; front_index++)
-      {
-
-        read_data = buff[front_index];
-
-        //Loop 8 times (all the bits in the byte), before reading the next byte of data.
-        for(int iteration = 0; iteration < 8; iteration++)
-        {
-
-          temp_data = temp_data << 1;
-          //Check if the Most significant bit is a one
-          if(read_data & MSB_BIT_MASK)
-          {
-            temp_data |= (SET_LAST_BIT_MASK); //append 1 into last bit
-          }
-
-          read_len++;
-          read_data = read_data << 1;
-
-          //Check if read_len is greater than HUFF_CODE_MAX_LENGTH
-          if(read_len > HUFF_CODE_MAX_LENGTH)
-          {
-            //Reset temp_data and read_len
-            temp_data = 0;
-            read_len = 0;
-          }
-
-          //If read_len lies in the range of min and max length of huff codes
-          else if(read_len >= HUFF_CODE_MIN_LENGTH && read_len <= HUFF_CODE_MAX_LENGTH)
-          {
-            decoded_data = HUFF_CODE_END_SYMBOL;
-            //Iterate throughout the table
-            for(int i=0; (huffman_code[i].code!=HUFF_CODE_END_SYMBOL) || (huffman_code[i].code_bits > 0);i++)
-            {
-              //Check if current len and code matches with any in lookup table
-              if((temp_data == huffman_code[i].code) && (read_len == huffman_code[i].code_bits))
-              {
-                //found!!
-                decoded_data = huffman_code[i].symbol;
-                break;
-              }
-            }
-            //If the decoding was Successful
-            if(decoded_data != HUFF_CODE_END_SYMBOL)
-            {
-              //Print decoded data and reset temp_data and read_len
-              setvbuf (stdout, NULL, _IONBF, 0);
-              //Do not print decoded data if decoded is '-' and it's the last byte in buffer
-              if((decoded_data != '-') && (front_index != buff_index))
-                printf("%c", decoded_data);
-              temp_data = 0;
-              read_len = 0;
-            }
-          }
-
-        }
-      }
+      //decode
+      huffman_decode(buff,buff_index);
     }
-}
-
-int main(int argc, char *argv[])
-{
-    printf("Opening port: %s\n",argv[1]);
-
-    assert(argc == TOTAL_ACCEPTABLE_TERMINAL_COMMANDS);
-
-    open_serial_port(argv[1]);
-
-    printf("Successful\n");
-
-    configure_serial_port();
-
-    start_serial_read();
-
-    return 0;
 }
