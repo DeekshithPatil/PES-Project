@@ -37,9 +37,13 @@ void start_serial_read();
 void test_huffman();
 void read_and_test(char * test_str);
 
+/*
+* Brief - This function is a exception handler function and is executed when Ctrl + C is pressed
+*/
 void int_handler(int sug)
 {
 
+  //Print compression statistics
   printf("\n\n********** Compression Statistics ****************\n");
   printf("\nTotal bits received = %d\nTotal bits decoded = %d\n",g_bits_received,g_bits_decoded);
 
@@ -47,9 +51,14 @@ void int_handler(int sug)
 
   printf("Achieved compression ratio: %f%% \n",  compression_ratio);
   printf("\n****************************************************\n");
+
+  //Grecefully close the program
   exit(0);
 }
 
+/*
+* Brief - Application entry point
+*/
 int main(int argc, char *argv[])
 {
   printf("Opening port: %s\n",argv[1]);
@@ -173,7 +182,7 @@ int huffman_decode(uint8_t *buff, int buff_index, unsigned char * decode_buff)
           //Print decoded data and reset temp_data and read_len
          setvbuf (stdout, NULL, _IONBF, 0);
           //Do not print decoded data if decoded is '-' and it's the last byte in buffer
-          if((decoded_data != '-') && (front_index != buff_index))
+          if(!((decoded_data != '-') || (front_index != buff_index)))
           {
 
             decode_buff[decode_index++] = decoded_data;
