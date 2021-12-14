@@ -1,3 +1,4 @@
+
 /*
 * Brief - This program is used to read data from serial terminal, and perform huffman decoding
 * Author - Deekshith Reddy Patil, patil.deekshithreddy@colorado.edu
