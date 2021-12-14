@@ -22,6 +22,7 @@
 #define BAUD_RATE                                    B115200
 #define TOTAL_ACCEPTABLE_TERMINAL_COMMANDS           2
 extern int g_fd;
+
 /*
 * Brief - This function is used to open a "serial_port" for commmunication
 */

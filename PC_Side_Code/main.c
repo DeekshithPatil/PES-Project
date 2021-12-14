@@ -37,9 +37,13 @@ void start_serial_read();
 void test_huffman();
 void read_and_test(char * test_str);
 
+/*
+* Brief - This function is used as an execption handler for Ctrl + C
+*/
 void int_handler(int sug)
 {
 
+  //Print compression ratio
   printf("\n\n********** Compression Statistics ****************\n");
   printf("\nTotal bits received = %d\nTotal bits decoded = %d\n",g_bits_received,g_bits_decoded);
 
@@ -47,9 +51,14 @@ void int_handler(int sug)
 
   printf("Achieved compression ratio: %f%% \n",  compression_ratio);
   printf("\n****************************************************\n");
+
+  //Gracefully end program
   exit(0);
 }
 
+/*
+* Brief - Application entry point
+*/
 int main(int argc, char *argv[])
 {
   printf("Opening port: %s\n",argv[1]);
@@ -205,7 +214,7 @@ void start_serial_read()
   int buff_index = 0;
   int decode_len = 0;
 
-  printf("\n****************************************\n");
+  printf("\n******************************************************\n");
   printf("Starting serial read!\nWaiting for data..\n");
 
   while(1)
@@ -283,7 +292,7 @@ void test_huffman()
   read_and_test(test_case_21);
   read_and_test(test_case_22);
   read_and_test(test_case_23);
-  printf("Successfully passed all test cases!\n");
+  printf("\n****************Successfully passed all test cases!******************\n");
 
   g_bits_received = 0;
   g_bits_decoded = 0;
@@ -308,7 +317,7 @@ void read_and_test(char * test_str)
   //decode
   decode_len = huffman_decode(buff,buff_index,decode_buff);
 
-  // printf("%s\n",decode_buff);
+  printf("\nTest Case Decode Output = %s\n",decode_buff);
   assert(strcmp(test_str,decode_buff)==0);
 
 }

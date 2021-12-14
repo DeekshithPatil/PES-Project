@@ -67,6 +67,9 @@ int huffman_encode(char *message, uint8_t *buffer, size_t nbytes)
 
 }
 
+/*
+ * Brief - Returns the minimum value among a and b
+ */
 static int min(int a , int b)
 {
 	if(a < b)
