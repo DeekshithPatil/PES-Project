@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <assert.h>
 
 #include "serial.h"
 #include "huffman.h"
@@ -29,10 +30,16 @@
 int g_bits_received = 0;
 int g_bits_decoded = 0;
 
+int get_buffer(uint8_t *buff);
+unsigned char find_huffman_symbol(uint32_t code, int code_bits);
+int huffman_decode(uint8_t *buff, int buff_index, unsigned char * decode_buffer);
+void start_serial_read();
+void test_huffman();
+void read_and_test(char * test_str);
+
 void int_handler(int sug)
 {
-  // printf("\b\b");
-  // fflush(stdout);
+
   printf("\n\n********** Compression Statistics ****************\n");
   printf("\nTotal bits received = %d\nTotal bits decoded = %d\n",g_bits_received,g_bits_decoded);
 
@@ -43,26 +50,23 @@ void int_handler(int sug)
   exit(0);
 }
 
-int get_buffer(uint8_t *buff);
-unsigned char find_huffman_symbol(uint32_t code, int code_bits);
-int huffman_decode(uint8_t *buff, int buff_index, unsigned char * decode_buffer);
-void start_serial_read();
-
 int main(int argc, char *argv[])
 {
-    printf("Opening port: %s\n",argv[1]);
+  printf("Opening port: %s\n",argv[1]);
 
-    assert(argc == TOTAL_ACCEPTABLE_TERMINAL_COMMANDS);
+  assert(argc == TOTAL_ACCEPTABLE_TERMINAL_COMMANDS);
 
-    open_serial_port(argv[1]);
+  open_serial_port(argv[1]);
 
-    printf("Successful\n");
+  printf("Successful\n");
 
-    configure_serial_port();
+  configure_serial_port();
 
-    start_serial_read();
+  test_huffman();
 
-    return 0;
+  start_serial_read();
+
+  return 0;
 }
 
 /*
@@ -167,11 +171,11 @@ int huffman_decode(uint8_t *buff, int buff_index, unsigned char * decode_buff)
         if(decoded_data != HUFF_CODE_END_SYMBOL)
         {
           //Print decoded data and reset temp_data and read_len
-          setvbuf (stdout, NULL, _IONBF, 0);
+         setvbuf (stdout, NULL, _IONBF, 0);
           //Do not print decoded data if decoded is '-' and it's the last byte in buffer
           if((decoded_data != '-') && (front_index != buff_index))
           {
-            // printf("%c", decoded_data);
+
             decode_buff[decode_index++] = decoded_data;
             //Increment the total number of bits recieved by the code_bits of the decoded symbol
             g_bits_received += read_len;
@@ -201,7 +205,7 @@ void start_serial_read()
   int buff_index = 0;
   int decode_len = 0;
 
-  printf("****************************************\n");
+  printf("\n****************************************\n");
   printf("Starting serial read!\nWaiting for data..\n");
 
   while(1)
@@ -216,6 +220,95 @@ void start_serial_read()
     decode_len = huffman_decode(buff,buff_index,decode_buff);
 
     printf("%s", decode_buff);
-    
+
   }
+}
+
+/*
+ * Brief - This function sends out test strings in order to test the functionality of huffman encoding and decoding
+ *
+ * Note - Do not Modify the test strings. If modified, the same modifications need to made on the KL25Z side as well
+ */
+void test_huffman()
+{
+
+  char * test_case_1 = "$";
+  char * test_case_2 = "Hello!";
+  char * test_case_3 = "0123456789";
+  char * test_case_4 = "12poijadsuf12e90]d'api'af";
+  char * test_case_5 = "q[wieofha;kdf;nvajlhaf;dhiulah124y3ro7halbvlajdf;h72rlfah";
+  char * test_case_6 = "\nHey! How's it going\n This is a huge string test. Let's see if it works!!!. I'm so excited!!\n";
+  char * test_case_7 = "The second string is long as well! This is decoded perfectly as well!!\n";
+  char * test_case_8 = "\nDynamic string No. = 1";
+  char * test_case_9 = "\nDynamic string No. = 2";
+  char * test_case_10 = "\nDynamic string No. = 3";
+  char * test_case_11 = "Nov 29 00:24:19 deekshith systemd logind[773]: Lid closed.";
+  char * test_case_12 = "Nov 29 14:27:52 deekshith sudo: pam_unix(sudo:session): session opened for user root by (uid=0)";
+  char * test_case_13 = "base passwd depends on libdebconfclient0 (>= 0.145); however:";
+  char * test_case_14 = "(Reading database ... 55";
+  char * test_case_15 = "(Reading database ... 220669 files and directories currently installed.)";
+  char * test_case_16 = "dbus daemon[930]: [session uid=999 pid=930] Successfully activated service 'org.gtk.vfs.Metadata";
+  char * test_case_17 = "Nov 29 00:24:06 deekshith systemd[16697]: Stopped target GNOME Shell on X11.";
+  char * test_case_18 = "Nov 29 00:24:06 deekshith gnome shell[16940]: message repeated 2 times: [ == Stack trace for context 0x559b7d3a4900 ==]";
+  char * test_case_19 = "Nov 29 00:24:33 deekshith NetworkManager[758]: <info>  [1638170673.6591] dhcp6 (wlp2s0): state changed bound > done";
+  char * test_case_20 = "Nov 29 13:17:11 deekshith /usr/lib/gdm3/gdm x session[36856]: (II) xfree86: Adding drm device (/dev/dri/card1)";
+  char * test_case_21 = "Nov 25 17:28:02 deekshith kernel: [65826.859822] OOM killer disabled.";
+  char * test_case_22 = "Nov 26 13:32:44 deekshith kernel: [65896.363271] sd 0:0:0:0: [sda] Stopping disk";
+  char * test_case_23 = "Nov 26 13:35:17 deekshith kernel: [    0.000000] reserve setup_data: [mem 0x0000000100000000 0x000000027f7fffff] usable";
+
+
+  printf("\n****************************************\n");
+  printf("Starting test cases\nWaiting for data..\n");
+
+  read_and_test(test_case_1);
+  read_and_test(test_case_2);
+  read_and_test(test_case_3);
+  read_and_test(test_case_4);
+  read_and_test(test_case_5);
+  read_and_test(test_case_6);
+  read_and_test(test_case_7);
+  read_and_test(test_case_8);
+  read_and_test(test_case_9);
+  read_and_test(test_case_10);
+  read_and_test(test_case_11);
+  read_and_test(test_case_12);
+  read_and_test(test_case_13);
+  read_and_test(test_case_14);
+  read_and_test(test_case_15);
+  read_and_test(test_case_16);
+  read_and_test(test_case_17);
+  read_and_test(test_case_18);
+  read_and_test(test_case_19);
+  read_and_test(test_case_20);
+  read_and_test(test_case_21);
+  read_and_test(test_case_22);
+  read_and_test(test_case_23);
+  printf("Successfully passed all test cases!\n");
+
+  g_bits_received = 0;
+  g_bits_decoded = 0;
+}
+
+/*
+* Brief - This funciton is used to read a buffer of data from serial port and compare the decoded string against
+*/
+void read_and_test(char * test_str)
+{
+  unsigned char decode_buff[DECODE_BUFF_SIZE];
+  uint8_t buff[BUFF_SIZE];
+  int buff_index = 0;
+  int decode_len = 0;
+
+  //get a buffer of data
+  do
+  {
+    buff_index = get_buffer(buff);
+  } while(buff_index < 1);
+
+  //decode
+  decode_len = huffman_decode(buff,buff_index,decode_buff);
+
+  // printf("%s\n",decode_buff);
+  assert(strcmp(test_str,decode_buff)==0);
+
 }
