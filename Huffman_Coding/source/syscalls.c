@@ -45,11 +45,15 @@ int __sys_write(int handle, char *buf, int size)
 	//If TxQueue is not full, enqueue the bytes
 	if(cbfifo_length(Tx_Buffer) != cbfifo_capacity(Tx_Buffer))
 	{
+<<<<<<< HEAD
 
+=======
+>>>>>>> fb33d6f17abcc9c354941f9cc2848fdb3c1de35a
 		temp = cbfifo_enqueue(Tx_Buffer,encode_buffer,len);
 
 		// start transmitter if it isn't already running
-		if (!(UART0->C2 & UART0_C2_TIE_MASK)) {
+		if (!(UART0->C2 & UART0_C2_TIE_MASK))
+		{
 			UART0->C2 |= UART0_C2_TIE(1);
 		}
 

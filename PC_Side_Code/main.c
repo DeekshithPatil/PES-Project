@@ -38,12 +38,20 @@ void test_huffman();
 void read_and_test(char * test_str);
 
 /*
+<<<<<<< HEAD
 * Brief - This function is used as an execption handler for Ctrl + C
+=======
+* Brief - This function is a exception handler function and is executed when Ctrl + C is pressed
+>>>>>>> fb33d6f17abcc9c354941f9cc2848fdb3c1de35a
 */
 void int_handler(int sug)
 {
 
+<<<<<<< HEAD
   //Print compression ratio
+=======
+  //Print compression statistics
+>>>>>>> fb33d6f17abcc9c354941f9cc2848fdb3c1de35a
   printf("\n\n********** Compression Statistics ****************\n");
   printf("\nTotal bits received = %d\nTotal bits decoded = %d\n",g_bits_received,g_bits_decoded);
 
@@ -52,7 +60,11 @@ void int_handler(int sug)
   printf("Achieved compression ratio: %f%% \n",  compression_ratio);
   printf("\n****************************************************\n");
 
+<<<<<<< HEAD
   //Gracefully end program
+=======
+  //Grecefully close the program
+>>>>>>> fb33d6f17abcc9c354941f9cc2848fdb3c1de35a
   exit(0);
 }
 
@@ -182,7 +194,7 @@ int huffman_decode(uint8_t *buff, int buff_index, unsigned char * decode_buff)
           //Print decoded data and reset temp_data and read_len
          setvbuf (stdout, NULL, _IONBF, 0);
           //Do not print decoded data if decoded is '-' and it's the last byte in buffer
-          if((decoded_data != '-') && (front_index != buff_index))
+          if(!((decoded_data != '-') || (front_index != buff_index)))
           {
 
             decode_buff[decode_index++] = decoded_data;

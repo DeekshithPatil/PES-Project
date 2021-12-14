@@ -18,7 +18,7 @@
 
 static int min(int a , int b);
 
-//Refer huffman.h for funciton description
+//Refer huffman.h for function description
 int huffman_encode(char *message, uint8_t *buffer, size_t nbytes)
 {
 	int buf_idx = 0; //Current write position encoded
