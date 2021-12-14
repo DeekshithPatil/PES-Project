@@ -1,4 +1,5 @@
 # Huffman Coding in python
+#reference: https://www.section.io/engineering-education/huffman-coding-python/
 
 string = ""
 f = open("logFiles.txt", "r")
@@ -57,6 +58,8 @@ while len(nodes) > 1:
     nodes = sorted(nodes, key=lambda x: x[1], reverse=True)
 
 huffmanCode = huffman_code_tree(nodes[0][0])
+
+# Print Header file
 c_hdr = """\
 /*
 * Huffman codes
@@ -97,8 +100,10 @@ print("huffman_code_t huffman_code[] = {")
 hexNumber = 0
 count = 0
 
+# Print characters, code and code_bits
+
 for (char, frequency) in freq:
-#     print(' %-4r |%s' % (char, huffmanCode[char]))
+
 
 
     hexNumber = hex(int((huffmanCode[char]),2))
@@ -109,7 +114,7 @@ for (char, frequency) in freq:
 
         print('{%r,%s,%d},' % (char, hexNumber,len(huffmanCode[char])))
 
-    # print('{%r,%s,%d},' % (char, hexNumber,len(huffmanCode[char])))
+
 
     count = count + 1
 
@@ -117,7 +122,7 @@ print("{HUFF_CODE_END_SYMBOL,0,0}};")
 
 print("")
 
-
+# Print function description
 c_func_desc = """
 /*
 * @brief - Encodes a message using the defined Huffman code.
