@@ -7,6 +7,7 @@
 		<item key="WizardProjectsImportPage.STORE_CLOSE_CREATED_PROJECTS_ID" value="false"/>
 		<item key="WizardProjectsImportPage.STORE_HIDE_CONFLICTING_PROJECTS_ID" value="false"/>
 		<list key="WizardProjectsImportPage.STORE_DIRECTORIES">
+			<item value="/home/deekshith/Desktop/PES-Project/Huffman_Coding"/>
 			<item value="/home/deekshith/Documents/PES/PES-Project/Huffman_Coding"/>
 		</list>
 		<list key="WizardProjectsImportPage.STORE_ARCHIVES">
@@ -14,6 +15,6 @@
 		</list>
 	</section>
 	<section name="com.crt.quickstart.views.wizards.examples.QSExampleSelectionPage">
-		<item key="dirname" value="/home/deekshith/Documents/PES/PES-Project/Huffman_Coding"/>
+		<item key="dirname" value="/home/deekshith/Desktop/PES-Project/Huffman_Coding"/>
 	</section>
 </section>
